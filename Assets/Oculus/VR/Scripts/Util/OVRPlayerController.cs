@@ -1,22 +1,13 @@
 /************************************************************************************
+Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Copyright   :   Copyright 2017 Oculus VR, LLC. All Rights reserved.
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
-Licensed under the Oculus VR Rift SDK License Version 3.4.1 (the "License");
-you may not use the Oculus VR Rift SDK except in compliance with the License,
-which is provided at the time of installation or download, or which
-otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-
-https://developer.oculus.com/licenses/sdk-3.4.1
-
-Unless required by applicable law or agreed to in writing, the Oculus VR SDK
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, either express or implied. See the License for the specific language governing
+permissions and limitations under the License.
 ************************************************************************************/
 
 using System;
@@ -65,6 +56,16 @@ public class OVRPlayerController : MonoBehaviour
 	public bool SnapRotation = true;
 
 	/// <summary>
+	/// [Deprecated] When enabled, snap rotation will happen about the guardian rather
+	/// than the player/camera viewpoint.
+	/// </summary>
+	[Tooltip("[Deprecated] When enabled, snap rotation will happen about the center of the " +
+		"guardian rather than the center of the player/camera viewpoint. This (legacy) " +
+		"option should be left off except for edge cases that require extreme behavioral " +
+		"backwards compatibility.")]
+	public bool RotateAroundGuardianCenter = false;
+
+	/// <summary>
 	/// How many fixed speeds to use with linear movement? 0=linear control
 	/// </summary>
 	[Tooltip("How many fixed speeds to use with linear movement? 0=linear control")]
@@ -84,7 +85,7 @@ public class OVRPlayerController : MonoBehaviour
 	/// Modifies the strength of gravity.
 	/// </summary>
 	public float GravityModifier = 0.379f;
-	
+
 	/// <summary>
 	/// If true, each OVRPlayerController will use the player's physical height.
 	/// </summary>
@@ -104,8 +105,8 @@ public class OVRPlayerController : MonoBehaviour
 	public event Action<Transform> TransformUpdated;
 
 	/// <summary>
-	/// This bool is set to true whenever the player controller has been teleported. It is reset after every frame. Some systems, such as 
-	/// CharacterCameraConstraint, test this boolean in order to disable logic that moves the character controller immediately 
+	/// This bool is set to true whenever the player controller has been teleported. It is reset after every frame. Some systems, such as
+	/// CharacterCameraConstraint, test this boolean in order to disable logic that moves the character controller immediately
 	/// following the teleport.
 	/// </summary>
 	[NonSerialized] // This doesn't need to be visible in the inspector.
@@ -117,7 +118,7 @@ public class OVRPlayerController : MonoBehaviour
 	public event Action CameraUpdated;
 
 	/// <summary>
-	/// This event is raised right before the character controller is actually moved in order to provide other systems the opportunity to 
+	/// This event is raised right before the character controller is actually moved in order to provide other systems the opportunity to
 	/// move the character controller in response to things other than user input, such as movement of the HMD. See CharacterCameraConstraint.cs
 	/// for an example of this.
 	/// </summary>
@@ -134,6 +135,11 @@ public class OVRPlayerController : MonoBehaviour
 	/// </summary>
 	public bool EnableRotation = true;
 
+	/// <summary>
+	/// Rotation defaults to secondary thumbstick. You can allow either here. Note that this won't behave well if EnableLinearMovement is true.
+	/// </summary>
+	public bool RotationEitherThumbstick = false;
+
 	protected CharacterController Controller = null;
 	protected OVRCameraRig CameraRig = null;
 
@@ -144,13 +150,14 @@ public class OVRPlayerController : MonoBehaviour
 	public float InitialYRotation { get; private set; }
 	private float MoveScaleMultiplier = 1.0f;
 	private float RotationScaleMultiplier = 1.0f;
-	private bool  SkipMouseRotation = true; // It is rare to want to use mouse movement in VR, so ignore the mouse by default.
-	private bool  HaltUpdateMovement = false;
+	private bool SkipMouseRotation = true; // It is rare to want to use mouse movement in VR, so ignore the mouse by default.
+	private bool HaltUpdateMovement = false;
 	private bool prevHatLeft = false;
 	private bool prevHatRight = false;
 	private float SimulationRate = 60f;
 	private float buttonRotation = 0f;
 	private bool ReadyToSnapTurn; // Set to true when a snap turn has occurred, code requires one frame of centered thumbstick to enable another snap turn.
+	private bool playerControllerEnabled = false;
 
 	void Start()
 	{
@@ -164,14 +171,14 @@ public class OVRPlayerController : MonoBehaviour
 	{
 		Controller = gameObject.GetComponent<CharacterController>();
 
-		if(Controller == null)
+		if (Controller == null)
 			Debug.LogWarning("OVRPlayerController: No CharacterController attached.");
 
 		// We use OVRCameraRig to set rotations to cameras,
 		// and to be influenced by rotation
 		OVRCameraRig[] CameraRigs = gameObject.GetComponentsInChildren<OVRCameraRig>();
 
-		if(CameraRigs.Length == 0)
+		if (CameraRigs.Length == 0)
 			Debug.LogWarning("OVRPlayerController: No OVRCameraRig attached.");
 		else if (CameraRigs.Length > 1)
 			Debug.LogWarning("OVRPlayerController: More then 1 OVRCameraRig attached.");
@@ -183,26 +190,39 @@ public class OVRPlayerController : MonoBehaviour
 
 	void OnEnable()
 	{
-		OVRManager.display.RecenteredPose += ResetOrientation;
-
-		if (CameraRig != null)
-		{
-			CameraRig.UpdatedAnchors += UpdateTransform;
-		}
 	}
 
 	void OnDisable()
 	{
-		OVRManager.display.RecenteredPose -= ResetOrientation;
-
-		if (CameraRig != null)
+		if (playerControllerEnabled)
 		{
-			CameraRig.UpdatedAnchors -= UpdateTransform;
+			OVRManager.display.RecenteredPose -= ResetOrientation;
+
+			if (CameraRig != null)
+			{
+				CameraRig.UpdatedAnchors -= UpdateTransform;
+			}
+			playerControllerEnabled = false;
 		}
 	}
 
 	void Update()
 	{
+		if (!playerControllerEnabled)
+		{
+			if (OVRManager.OVRManagerinitialized)
+			{
+				OVRManager.display.RecenteredPose += ResetOrientation;
+
+				if (CameraRig != null)
+				{
+					CameraRig.UpdatedAnchors += UpdateTransform;
+				}
+				playerControllerEnabled = true;
+			}
+			else
+				return;
+		}
 		//Use keys to ratchet rotation
 		if (Input.GetKeyDown(KeyCode.Q))
 			buttonRotation -= RotationRatchet;
@@ -233,7 +253,7 @@ public class OVRPlayerController : MonoBehaviour
 			}
 			else if (OVRManager.instance.trackingOriginType == OVRManager.TrackingOrigin.FloorLevel)
 			{
-				p.y = - (0.5f * Controller.height) + Controller.center.y;
+				p.y = -(0.5f * Controller.height) + Controller.center.y;
 			}
 			CameraRig.transform.localPosition = p;
 		}
@@ -395,7 +415,7 @@ public class OVRPlayerController : MonoBehaviour
 
 		if (EnableRotation)
 		{
-			Vector3 euler = transform.rotation.eulerAngles;
+			Vector3 euler = RotateAroundGuardianCenter ? transform.rotation.eulerAngles : Vector3.zero;
 			float rotateInfluence = SimulationRate * Time.deltaTime * RotationAmount * RotationScaleMultiplier;
 
 			bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
@@ -423,8 +443,8 @@ public class OVRPlayerController : MonoBehaviour
 
 			if (SnapRotation)
 			{
-
-				if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickLeft))
+				if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickLeft) ||
+					(RotationEitherThumbstick && OVRInput.Get(OVRInput.Button.PrimaryThumbstickLeft)))
 				{
 					if (ReadyToSnapTurn)
 					{
@@ -432,7 +452,8 @@ public class OVRPlayerController : MonoBehaviour
 						ReadyToSnapTurn = false;
 					}
 				}
-				else if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight))
+				else if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight) ||
+					(RotationEitherThumbstick && OVRInput.Get(OVRInput.Button.PrimaryThumbstickRight)))
 				{
 					if (ReadyToSnapTurn)
 					{
@@ -448,10 +469,25 @@ public class OVRPlayerController : MonoBehaviour
 			else
 			{
 				Vector2 secondaryAxis = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+				if (RotationEitherThumbstick)
+				{
+					Vector2 altSecondaryAxis = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+					if (secondaryAxis.sqrMagnitude < altSecondaryAxis.sqrMagnitude)
+					{
+						secondaryAxis = altSecondaryAxis;
+					}
+				}
 				euler.y += secondaryAxis.x * rotateInfluence;
 			}
 
-			transform.rotation = Quaternion.Euler(euler);
+			if (RotateAroundGuardianCenter)
+			{
+				transform.rotation = Quaternion.Euler(euler);
+			}
+			else
+			{
+				transform.RotateAround(CameraRig.centerEyeAnchor.position, Vector3.up, euler.y);
+			}
 		}
 	}
 
@@ -590,4 +626,3 @@ public class OVRPlayerController : MonoBehaviour
 		}
 	}
 }
-

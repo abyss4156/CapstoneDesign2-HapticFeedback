@@ -1,3 +1,15 @@
+/************************************************************************************
+Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
+
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
+
+Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, either express or implied. See the License for the specific language governing
+permissions and limitations under the License.
+************************************************************************************/
+
 using UnityEngine;
 using System;
 using System.IO;
@@ -251,7 +263,7 @@ public static class OVRHaptics
 				OVRPlugin.HapticsBuffer hapticsBuffer;
 				hapticsBuffer.Samples = m_nativeBuffer.GetPointer();
 				hapticsBuffer.SamplesCount = acquiredSamplesCount;
-	
+
 				OVRPlugin.SetControllerHaptics(m_controller, hapticsBuffer);
 
 				hapticsState = OVRPlugin.GetControllerHapticsState(m_controller);
@@ -324,7 +336,7 @@ public static class OVRHaptics
 							{
 								sample = b.Samples[bReadCount]; // TODO support multi-byte samples
 							}
-	
+
 							mixClip.WriteSample(sample); // TODO support multi-byte samples
 						}
 					}
@@ -370,4 +382,3 @@ public static class OVRHaptics
 		}
 	}
 }
-
