@@ -7,7 +7,6 @@ public class ChangeScene : MonoBehaviour
 {
     private Vector3 ScreenCenter;
     private RaycastHit hit;
-    private ObjectGlow highlight;
 
     void Start()
     {
@@ -20,19 +19,15 @@ public class ChangeScene : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 100.0f)) {
 
-            // outline highlight shader is needed
-
             if (hit.collider.gameObject.name == "TitleButton") {
 
                 // if (OVRInput.Get(OVRInput.Button.One))
-                //     SceneManager.LoadScene("Title");
                 if (Input.GetButtonDown("Fire1"))
                     SceneManager.LoadScene("SampleScene");
             }
             else if (hit.collider.gameObject.name == "EndingButton") {
 
                 // if (OVRInput.Get(OVRInput.Button.One))
-                //     SceneManager.LoadScene("Title");
                 if (Input.GetButtonDown("Fire1"))
                     SceneManager.LoadScene("Title");
             }

@@ -19,7 +19,7 @@ public class BigFireTouch : MonoBehaviour {
 
     }
 
-    void OnTriggerEnter(Collider collider)
+    void OnCollisionEnter(Collision collision)
     {
         if (condition.get_curtain && condition.is_curtainWatered) {
 

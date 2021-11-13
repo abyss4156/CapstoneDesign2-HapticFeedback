@@ -8,7 +8,8 @@ public class SmallFireTouch : MonoBehaviour {
     UIoutput ui;
     PlayerCondition condition;
 
-	void Start () {
+	void Start () 
+    {
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
 	}
@@ -18,9 +19,9 @@ public class SmallFireTouch : MonoBehaviour {
 
 	}
 
-    void OnTriggerEnter (Collider collider)
+    void OnCollisionEnter (Collision collision)
     {
-        if (collider.gameObject.name == "Player") {
+        if (collision.collider.gameObject.name == "Player") {
 
             ui.warning = true;
 

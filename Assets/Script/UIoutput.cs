@@ -97,7 +97,5 @@ public class UIoutput : MonoBehaviour {
             UIpanel.SetActive(false);
             m_text.text = "";
         }
-
-        Debug.Log(m_text.text);
     }
 }
