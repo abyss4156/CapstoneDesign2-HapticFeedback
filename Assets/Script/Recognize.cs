@@ -8,6 +8,12 @@ public class Recognize : MonoBehaviour
     public GameObject hand;
     public ParticleSystem water;
     public AudioSource pickupsound;
+    
+    public bool is_onVR;
+    [HideInInspector]
+    public bool inputOn;
+    [HideInInspector]
+    public bool inputOff;
 
     private Vector3 ScreenCenter;
     RaycastHit hit;
@@ -20,9 +26,20 @@ public class Recognize : MonoBehaviour
     void Start()
     {
         hand = GameObject.Find("Hand");
-        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 2 / 3);
+        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 3 / 4);
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
+
+        if (is_onVR) {
+
+            inputOn = OVRInput.Get(OVRInput.Button.One);
+            inputOff = OVRInput.Get(OVRInput.Button.Two);
+        }
+        else { 
+
+            inputOn = Input.GetButtonDown("Fire1");
+            inputOff = Input.GetButtonDown("Fire2");
+        }
 
         waterSound = water.GetComponent<AudioSource>();
         var emission = water.emission;
@@ -48,7 +65,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
+            if (tag == "PickUp" && !condition.is_holding && inputOn) {
 
                 BoxCollider boxcol = hit.collider.GetComponent<BoxCollider>();
                 Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
@@ -68,7 +85,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
+            if (tag == "Item" && inputOn) {
 
                 string name = hit.collider.gameObject.name;
 
@@ -83,7 +100,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
+            if (hit.collider.gameObject.name == "sink" && inputOn) {
 
                 var emission = water.emission;
 

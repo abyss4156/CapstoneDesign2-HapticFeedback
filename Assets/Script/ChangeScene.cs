@@ -10,7 +10,7 @@ public class ChangeScene : MonoBehaviour
 
     void Start()
     {
-        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 2 / 3);
+        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 3 / 4);
     }
 
     void Update()
