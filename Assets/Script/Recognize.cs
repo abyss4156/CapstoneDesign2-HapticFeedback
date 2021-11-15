@@ -47,7 +47,8 @@ public class Recognize : MonoBehaviour
                 objGlow.NotSelected();
 
             // OVRInput.Get(OVRInput.Button.One)
-            if (tag == "PickUp" && !condition.is_holding && Input.GetButtonDown("Fire1")) {
+            // Input.GetButtonDown("Fire1")
+            if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
 
                 BoxCollider boxcol = hit.collider.GetComponent<BoxCollider>();
                 Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
@@ -66,7 +67,8 @@ public class Recognize : MonoBehaviour
             }
 
             // OVRInput.Get(OVRInput.Button.One)
-            if (tag == "Item" && Input.GetButtonDown("Fire1")) {
+            // Input.GetButtonDown("Fire1")
+            if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
 
                 string name = hit.collider.gameObject.name;
 
@@ -80,7 +82,8 @@ public class Recognize : MonoBehaviour
             }
 
             // OVRInput.Get(OVRInput.Button.One)
-            if (hit.collider.gameObject.name == "sink" && Input.GetButtonDown("Fire1")) {
+            // Input.GetButtonDown("Fire1")
+            if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
 
                 var emission = water.emission;
 

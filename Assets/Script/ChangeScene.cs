@@ -21,14 +21,16 @@ public class ChangeScene : MonoBehaviour
 
             if (hit.collider.gameObject.name == "TitleButton") {
 
-                // if (OVRInput.Get(OVRInput.Button.One))
-                if (Input.GetButtonDown("Fire1"))
+                // OVRInput.Get(OVRInput.Button.One)
+                // Input.GetButtonDown("Fire1")
+                if (OVRInput.Get(OVRInput.Button.One))
                     SceneManager.LoadScene("SampleScene");
             }
             else if (hit.collider.gameObject.name == "EndingButton") {
 
-                // if (OVRInput.Get(OVRInput.Button.One))
-                if (Input.GetButtonDown("Fire1"))
+                // OVRInput.Get(OVRInput.Button.One)
+                // Input.GetButtonDown("Fire1")
+                if (OVRInput.Get(OVRInput.Button.One))
                     SceneManager.LoadScene("Title");
             }
         }
