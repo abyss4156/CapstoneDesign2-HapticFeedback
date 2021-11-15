@@ -20,7 +20,7 @@ public class Recognize : MonoBehaviour
     void Start()
     {
         hand = GameObject.Find("Hand");
-        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 2);
+        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 2 / 3);
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
