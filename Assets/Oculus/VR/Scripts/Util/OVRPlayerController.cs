@@ -418,14 +418,16 @@ public class OVRPlayerController : MonoBehaviour
 			Vector3 euler = RotateAroundGuardianCenter ? transform.rotation.eulerAngles : Vector3.zero;
 			float rotateInfluence = SimulationRate * Time.deltaTime * RotationAmount * RotationScaleMultiplier;
 
-			bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
+			// bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
+			bool curHatLeft = OVRInput.Get(OVRInput.Button.DpadLeft);
 
 			if (curHatLeft && !prevHatLeft)
 				euler.y -= RotationRatchet;
 
 			prevHatLeft = curHatLeft;
 
-			bool curHatRight = OVRInput.Get(OVRInput.Button.SecondaryShoulder);
+			// bool curHatRight = OVRInput.Get(OVRInput.Button.SecondaryShoulder);
+			bool curHatRight = OVRInput.Get(OVRInput.Button.DpadRight);
 
 			if (curHatRight && !prevHatRight)
 				euler.y += RotationRatchet;

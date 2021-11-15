@@ -8,9 +8,8 @@ public class DetachChild : MonoBehaviour {
     private BoxCollider bc;
     private PlayerCondition condition;
 
-	void Start () {
-        
-        //rb = gameObject.GetComponent<Rigidbody>();
+	void Start () 
+    {    
         bc = gameObject.GetComponent<BoxCollider>();
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
 	}
@@ -18,7 +17,8 @@ public class DetachChild : MonoBehaviour {
 	void Update ()
     {
         // OVRInput.Get(OVRInput.Button.Two)
-        if (Input.GetButtonDown("Fire2") && condition.is_holding && this.transform.parent != null) {
+        // Input.GetButtonDown("Fire2")
+        if (condition.is_holding && this.transform.parent != null && OVRInput.Get(OVRInput.Button.Two)) {
 
             this.transform.parent.DetachChildren();
             rb = this.gameObject.AddComponent<Rigidbody>();
