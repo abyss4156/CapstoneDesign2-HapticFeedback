@@ -20,10 +20,10 @@ public class Recognize : MonoBehaviour
     void Start()
     {
         hand = GameObject.Find("Hand");
-        // ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 4 / 5);
-        ScreenCenter = new Vector3(GameObject.Find("CenterEyeEnchor").GetComponent<Camera>().pixelWidth / 2,
-                                   GameObject.Find("CenterEyeAnchor").GetComponent<Camera>().pixelHeight * 4 / 5);
-        condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
+        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 4 / 5);
+        // ScreenCenter = new Vector3(GameObject.Find("CenterEyeEnchor").GetComponent<Camera>().pixelWidth / 2,
+        //                            GameObject.Find("CenterEyeAnchor").GetComponent<Camera>().pixelHeight * 4 / 5);
+        condition = GetComponent<PlayerCondition>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
         waterSound = water.GetComponent<AudioSource>();
@@ -48,8 +48,7 @@ public class Recognize : MonoBehaviour
             else if (objGlow != null)
                 objGlow.NotSelected();
 
-            // OVRInput.Get(OVRInput.Button.One)
-            // Input.GetButtonDown("Fire1")
+            //if (tag == "PickUp" && !condition.is_holding && Input.GetButtonDown("Fire1")) {
             if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
 
                 BoxCollider boxcol = hit.collider.GetComponent<BoxCollider>();
@@ -60,7 +59,6 @@ public class Recognize : MonoBehaviour
                 Destroy(rb);
 
                 hit.transform.position = hand.transform.position;
-                hit.transform.rotation.Set(-90,hand.transform.rotation.y ,hit.transform.rotation.z, hit.transform.rotation.w);
                 hit.transform.SetParent(hand.transform);
 
                 if (hit.collider.gameObject.name == "Jerrycan")
@@ -69,8 +67,7 @@ public class Recognize : MonoBehaviour
                     condition.get_fireEx = true;
             }
 
-            // OVRInput.Get(OVRInput.Button.One)
-            // Input.GetButtonDown("Fire1")
+            //if (tag == "Item" && Input.GetButtonDown("Fire1")) {
             if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
 
                 string name = hit.collider.gameObject.name;
@@ -84,8 +81,7 @@ public class Recognize : MonoBehaviour
                 hit.collider.gameObject.SetActive(false);
             }
 
-            // OVRInput.Get(OVRInput.Button.One)
-            // Input.GetButtonDown("Fire1")
+            //if (hit.collider.gameObject.name == "sink" && Input.GetButtonDown("Fire1")) {
             if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
 
                 var emission = water.emission;
