@@ -20,7 +20,9 @@ public class Recognize : MonoBehaviour
     void Start()
     {
         hand = GameObject.Find("Hand");
-        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 4 / 5);
+        // ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 4 / 5);
+        ScreenCenter = new Vector3(GameObject.Find("CenterEyeEnchor").GetComponent<Camera>().pixelWidth / 2,
+                                   GameObject.Find("CenterEyeAnchor").GetComponent<Camera>().pixelHeight * 4 / 5);
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
@@ -48,7 +50,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (tag == "PickUp" && !condition.is_holding && Input.GetButtonDown("Fire1")) {
+            if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
 
                 BoxCollider boxcol = hit.collider.GetComponent<BoxCollider>();
                 Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
@@ -69,7 +71,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (tag == "Item" && Input.GetButtonDown("Fire1")) {
+            if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
 
                 string name = hit.collider.gameObject.name;
 
@@ -84,7 +86,7 @@ public class Recognize : MonoBehaviour
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (hit.collider.gameObject.name == "sink" && Input.GetButtonDown("Fire1")) {
+            if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
 
                 var emission = water.emission;
 
