@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BillBoard : MonoBehaviour {
+public class CanvasToward : MonoBehaviour {
 
     private Transform tr;
     private Transform camTr;
@@ -15,6 +15,6 @@ public class BillBoard : MonoBehaviour {
 	
 	void Update () 
     {
-        tr.LookAt(camTr.position*-1);
+        tr.LookAt(camTr.position);
 	}
 }

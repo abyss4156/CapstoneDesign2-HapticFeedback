@@ -22,13 +22,13 @@ public class FireExtinguisher : MonoBehaviour {
 
 	void Update () 
     {
-        if (condition.get_fireEx) {
+        if (condition.get_fireEx && this.transform.parent.parent) {
 
             var emission = powder.emission;
 
             // OVRInput.Get(OVRInput.Button.One)
             // Input.GetButtonDown("Fire1")
-            if (OVRInput.Get(OVRInput.Button.One)) {
+            if (Input.GetButtonDown("Fire1")) {
 
                 if (!emission.enabled) {
 
