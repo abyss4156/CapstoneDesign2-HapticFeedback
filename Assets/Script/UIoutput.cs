@@ -90,6 +90,15 @@ public class UIoutput : MonoBehaviour {
                 case 4:
                     m_text.text = "누전되는 곳의 전기를 끊었다!";
                     break;
+                case 5:
+                    m_text.text = "B형 소화기";
+                    break;
+                case 6:
+                    m_text.text = "C형 소화기";
+                    break;
+                case 7:
+                    m_text.text = "D형 소화기";
+                    break;
                 default:
                     break;
             }

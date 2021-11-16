@@ -66,8 +66,19 @@ public class Recognize : MonoBehaviour
 
                 if (hit.collider.gameObject.name == "Jerrycan")
                     condition.get_jerrycan = true;
-                else if (hit.collider.gameObject.name.Contains("fire extinguisher"))
+                else if (hit.collider.gameObject.name.Contains("fire extinguisher")) {
+                    
                     condition.get_fireEx = true;
+                    ui.announcing = true;
+
+                    if (hit.collider.gameObject.name.Contains("B"))
+                        ui.announcing_about = 5;
+                    else if (hit.collider.gameObject.name.Contains("C"))
+                        ui.announcing_about = 6;
+                    else
+                        ui.announcing_about = 7;
+                }
+                
             }
 
             if (tag == "Item" && Input.GetButtonDown("Fire1")) {
