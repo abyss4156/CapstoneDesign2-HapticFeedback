@@ -14,16 +14,17 @@ public class Recognize : MonoBehaviour
     ObjectGlow objGlow;
 
     PlayerCondition condition;
+    MsgListener msgListener;
     UIoutput ui;
     AudioSource waterSound;
 
     void Start()
     {
         hand = GameObject.Find("Hand");
-        ScreenCenter = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight * 4 / 5);
-        // ScreenCenter = new Vector3(GameObject.Find("CenterEyeEnchor").GetComponent<Camera>().pixelWidth / 2,
-        //                            GameObject.Find("CenterEyeAnchor").GetComponent<Camera>().pixelHeight * 4 / 5);
+        // ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, 0));
+        ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.6f, 1.2f, 0));
         condition = GetComponent<PlayerCondition>();
+        msgListener = GameObject.Find("message generator").GetComponent<MsgListener>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
         waterSound = water.GetComponent<AudioSource>();
@@ -110,7 +111,33 @@ public class Recognize : MonoBehaviour
                     ui.announcing_about = 3;
                     ui.announcing = true;
                 }
+
+                msgListener.send_message(5);
             }
+        }
+
+        if (condition.get_curtain && condition.is_curtainWatered)
+            msgListener.send_message(5);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.collider.gameObject.name == "mesh_node.003") {
+
+            if (!condition.is_curtainWatered) {
+
+                msgListener.send_message(4);
+                msgListener.send_message(6);
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider.gameObject.name == "mesh_node.003") {
+
+            msgListener.send_message(-4);
+            msgListener.send_message(-6);
         }
     }
 }

@@ -9,12 +9,14 @@ public class FireExtinguisher : MonoBehaviour {
     public AudioSource fbxShooting;
     
     PlayerCondition condition;
+    MsgListener msgListener;
 
     private float lastTime = 1.5f;
 
     void Start()
     {
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
+        msgListener = GameObject.Find("message generator").GetComponent<MsgListener>();
 
         var emission = powder.emission;
         emission.enabled = false;
@@ -33,11 +35,13 @@ public class FireExtinguisher : MonoBehaviour {
 
                     emission.enabled = true;
                     fbxShooting.Play();
+                    msgListener.send_message(2);
                 }
                 else {
 
                     fbxShooting.Stop();
                     emission.enabled = false;
+                    msgListener.send_message(-2);
                 }
             }
         }
@@ -45,7 +49,7 @@ public class FireExtinguisher : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.name == smallFire.name) {
+        if (other.gameObject.name == smallFire.name) {
 
             if (lastTime > 0) {
 
