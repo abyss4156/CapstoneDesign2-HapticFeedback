@@ -10,13 +10,15 @@ public class FireExtinguisher : MonoBehaviour {
     
     PlayerCondition condition;
     MsgListener msgListener;
+    UIoutput ui;
 
     private float lastTime = 1.5f;
 
     void Start()
     {
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
-        msgListener = GameObject.Find("message generator").GetComponent<MsgListener>();
+        msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
+        ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
         var emission = powder.emission;
         emission.enabled = false;
@@ -28,8 +30,8 @@ public class FireExtinguisher : MonoBehaviour {
 
             var emission = powder.emission;
 
-            //if (Input.GetButtonDown("Fire1")) {
-            if (OVRInput.Get(OVRInput.Button.One)) {
+            if (Input.GetButtonDown("Fire1")) {
+            //if (OVRInput.Get(OVRInput.Button.One)) {
 
                 if (!emission.enabled) {
 
@@ -49,18 +51,26 @@ public class FireExtinguisher : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.name == smallFire.name) {
+        if (other.gameObject.name == "Fireball_big_red_Door") {
 
-            if (lastTime > 0) {
+            if (this.transform.parent.name.Contains("C")) {
 
-                lastTime -= Time.deltaTime;
-                smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                if (lastTime > 0) {
+
+                    lastTime -= Time.deltaTime;
+                    smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                }
+                else {
+
+                    Destroy(smallFire.gameObject);
+                    GetComponent<BoxCollider>().enabled = false;
+                    return;
+                }
             }
             else {
 
-                Destroy(smallFire.gameObject);
-                GetComponent<BoxCollider>().enabled = false;
-                return;
+                ui.warning_about = 7;
+                ui.warning = true;
             }
         }
     }

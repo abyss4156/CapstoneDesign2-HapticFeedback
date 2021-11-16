@@ -13,7 +13,7 @@ public class MsgListener : MonoBehaviour
     bitwise subBitwise;
 
     int add_oper(int x, int y) { return x | y; }
-    int sub_oper(int x, int y) { return x & (127 - y); }
+    int sub_oper(int x, int y) { return x & (63 - y); }
     int result(int x, int y, bitwise calc) { return calc(x, y); }
 
     void Start()
@@ -44,15 +44,18 @@ public class MsgListener : MonoBehaviour
 
         if (code > 0) {
 
+            code -= 1;
             oper = result(oper, (int)Mathf.Pow(2.0f, code), addBitwise);
         }
         else if (code < 0) {
 
-            code *= -1;
+            code = code * (-1) - 1;
             oper = result(oper, (int)Mathf.Pow(2.0f, code), subBitwise);
         }
 
-        serialController.SendSerialMessage(oper.ToString());
+        char operChar = (char)oper;
+        Debug.Log(oper + " is sending to device");
+        serialController.SendSerialMessage(operChar.ToString());
     }
 
     void OnMessageArrived(string msg)

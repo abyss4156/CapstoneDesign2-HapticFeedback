@@ -39,7 +39,7 @@ public class UIoutput : MonoBehaviour {
             switch (warning_about) {
                 // 문
                 case 1:
-                    m_text.text = "문 밖에서 연기가 들어온다.\n이 상태로 나갈 수 없을 것 같다.";
+                    m_text.text = "문 밖에서 연기가 들어온다.\n문고리가 뜨겁다.\n이 상태로 나갈 수 없을 것 같다.";
                     break;
                 // 작은 불
                 case 2: 
@@ -56,6 +56,12 @@ public class UIoutput : MonoBehaviour {
                 // 큰 불, towel이 젖지 않은 상태에서
                 case 5: 
                     m_text.text = "불을 통과하기 위해선\n커튼을 적시고 몸을 감싸야 겠다.";
+                    break;
+                case 6:
+                    m_text.text = "아직 전기가 흐르고 있어 위험하다.\n전기를 끊어야 겠다.";
+                    break;
+                case 7:
+                    m_text.text = "이 소화기로는 전기 화재를 끌 수 없다.";
                     break;
                 default:
                     break;
@@ -80,6 +86,9 @@ public class UIoutput : MonoBehaviour {
                     break;
                 case 3: 
                     m_text.text = "커튼을 적셨다! 이제 나갈 수 있겠다!";
+                    break;
+                case 4:
+                    m_text.text = "누전되는 곳의 전기를 끊었다!";
                     break;
                 default:
                     break;

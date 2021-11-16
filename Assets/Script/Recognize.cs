@@ -7,6 +7,8 @@ public class Recognize : MonoBehaviour
 {
     public GameObject hand;
     public ParticleSystem water;
+    public ParticleSystem waterDrop;
+    public ParticleSystem lightning;
     public AudioSource pickupsound;
 
     private Vector3 ScreenCenter;
@@ -21,10 +23,10 @@ public class Recognize : MonoBehaviour
     void Start()
     {
         hand = GameObject.Find("Hand");
-        // ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, 0));
-        ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.6f, 1.2f, 0));
+        ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, 0));
+        //ScreenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.6f, 1.2f, 0));
         condition = GetComponent<PlayerCondition>();
-        msgListener = GameObject.Find("message generator").GetComponent<MsgListener>();
+        msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
         ui = GameObject.Find("Canvas").GetComponent<UIoutput>();
 
         waterSound = water.GetComponent<AudioSource>();
@@ -49,8 +51,8 @@ public class Recognize : MonoBehaviour
             else if (objGlow != null)
                 objGlow.NotSelected();
 
-            //if (tag == "PickUp" && !condition.is_holding && Input.GetButtonDown("Fire1")) {
-            if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
+            if (tag == "PickUp" && !condition.is_holding && Input.GetButtonDown("Fire1")) {
+            //if (tag == "PickUp" && !condition.is_holding && OVRInput.Get(OVRInput.Button.One)) {
 
                 BoxCollider boxcol = hit.collider.GetComponent<BoxCollider>();
                 Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
@@ -68,8 +70,8 @@ public class Recognize : MonoBehaviour
                     condition.get_fireEx = true;
             }
 
-            //if (tag == "Item" && Input.GetButtonDown("Fire1")) {
-            if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
+            if (tag == "Item" && Input.GetButtonDown("Fire1")) {
+            //if (tag == "Item" && OVRInput.Get(OVRInput.Button.One)) {
 
                 string name = hit.collider.gameObject.name;
 
@@ -82,8 +84,8 @@ public class Recognize : MonoBehaviour
                 hit.collider.gameObject.SetActive(false);
             }
 
-            //if (hit.collider.gameObject.name == "sink" && Input.GetButtonDown("Fire1")) {
-            if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
+            if (hit.collider.gameObject.name == "sink" && Input.GetButtonDown("Fire1")) {
+            //if (hit.collider.gameObject.name == "sink" && OVRInput.Get(OVRInput.Button.One)) {
 
                 var emission = water.emission;
 
@@ -114,30 +116,28 @@ public class Recognize : MonoBehaviour
 
                 msgListener.send_message(5);
             }
+            
+            if (hit.collider.gameObject.name == "ElectroPanel" && Input.GetButtonDown("Fire1")) {
+                //if (hit.collider.gameObject.name == "ElectroPanel" && OVRInput.Get(OVRInput.Button.One)) {
+
+                if (!condition.is_electricTurnOff) {
+
+                    var emission = lightning.emission;
+                    AudioSource audio = lightning.GetComponent<AudioSource>();
+                    BoxCollider bc = waterDrop.GetComponent<BoxCollider>();
+
+                    condition.is_electricTurnOff = true;
+                    emission.enabled = false;
+                    audio.Stop();
+                    bc.isTrigger = true;
+
+                    ui.announcing_about = 4;
+                    ui.announcing = true;
+                }
+            }
         }
 
         if (condition.get_curtain && condition.is_curtainWatered)
             msgListener.send_message(5);
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.collider.gameObject.name == "mesh_node.003") {
-
-            if (!condition.is_curtainWatered) {
-
-                msgListener.send_message(4);
-                msgListener.send_message(6);
-            }
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.gameObject.name == "mesh_node.003") {
-
-            msgListener.send_message(-4);
-            msgListener.send_message(-6);
-        }
     }
 }

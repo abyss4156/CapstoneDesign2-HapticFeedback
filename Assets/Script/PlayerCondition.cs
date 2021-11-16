@@ -19,6 +19,8 @@ public class PlayerCondition : MonoBehaviour
     [HideInInspector]
     public bool get_hammer;
     [HideInInspector]
+    public bool is_electricTurnOff;
+    [HideInInspector]
     public bool get_curtain;
     [HideInInspector]
     public bool is_curtainWatered;
@@ -32,6 +34,7 @@ public class PlayerCondition : MonoBehaviour
         get_towel = false;
         is_towelWatered = false;
         get_hammer = false;
+        is_electricTurnOff = false;
         get_curtain = false;
         is_curtainWatered = false;
     }
