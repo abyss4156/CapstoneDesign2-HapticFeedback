@@ -2270,8 +2270,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hand: {fileID: 20264899}
   water: {fileID: 530305033}
-  waterDrop: {fileID: 0}
-  lightning: {fileID: 0}
+  waterDrop: {fileID: 1476727376}
+  lightning: {fileID: 685428981}
   pickupsound: {fileID: 1050094038}
 --- !u!136 &420652186
 CapsuleCollider:

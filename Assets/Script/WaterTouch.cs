@@ -33,8 +33,8 @@ public class WaterTouch : MonoBehaviour
     {
         if (other.gameObject.tag == "Player") {
 
-            msgListener.send_message(3);
-            msgListener.send_message(5);
+            msgListener.change_message(3);
+            msgListener.change_message(5);
         }
     }
 
@@ -42,8 +42,8 @@ public class WaterTouch : MonoBehaviour
     {
         if (other.gameObject.tag == "Player") {
 
-            msgListener.send_message(-3);
-            msgListener.send_message(-5);
+            msgListener.change_message(-3);
+            msgListener.change_message(-5);
         }
     }
 }

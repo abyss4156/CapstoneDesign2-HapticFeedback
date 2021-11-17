@@ -125,7 +125,7 @@ public class Recognize : MonoBehaviour
                     ui.announcing = true;
                 }
 
-                msgListener.send_message(5);
+                msgListener.change_message(5);
             }
             
             if (hit.collider.gameObject.name == "ElectroPanel" && Input.GetButtonDown("Fire1")) {
@@ -149,6 +149,6 @@ public class Recognize : MonoBehaviour
         }
 
         if (condition.get_curtain && condition.is_curtainWatered)
-            msgListener.send_message(5);
+            msgListener.change_message(5);
     }
 }

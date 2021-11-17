@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class CanvasToward : MonoBehaviour {
 
-    private Transform tr;
-    private Transform camTr;
+    private Camera mainCam;
+    private Transform camTransform;
+    private Transform canvasTransform;
 
 	void Start ()
     {
-        tr = GetComponent<Transform>();
-        camTr = Camera.main.GetComponent<Transform>();
+        mainCam = Camera.main;
+        camTransform = mainCam.GetComponent<Transform>();
+        canvasTransform = GetComponent<Transform>();
     }
 	
 	void Update () 
     {
-        tr.LookAt(camTr.position);
+        Vector3 screenCenter = mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f));
+        canvasTransform.LookAt(screenCenter);
 	}
 }

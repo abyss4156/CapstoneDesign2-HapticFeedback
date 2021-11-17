@@ -24,8 +24,8 @@ public class SmokeTouch : MonoBehaviour
 
             if (!condition.is_curtainWatered) {
 
-                msgListener.send_message(4);
-                msgListener.send_message(6);
+                msgListener.change_message(4);
+                msgListener.change_message(6);
             }
         }
     }
@@ -34,8 +34,8 @@ public class SmokeTouch : MonoBehaviour
     {
         if (other.gameObject.tag == "Player") {
 
-            msgListener.send_message(-4);
-            msgListener.send_message(-6);
+            msgListener.change_message(-4);
+            msgListener.change_message(-6);
         }
     }
 }

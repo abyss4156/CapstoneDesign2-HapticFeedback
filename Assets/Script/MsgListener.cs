@@ -12,6 +12,8 @@ public class MsgListener : MonoBehaviour
     bitwise addBitwise;
     bitwise subBitwise;
 
+    private float interval;
+
     int add_oper(int x, int y) { return x | y; }
     int sub_oper(int x, int y) { return x & (63 - y); }
     int result(int x, int y, bitwise calc) { return calc(x, y); }
@@ -23,14 +25,24 @@ public class MsgListener : MonoBehaviour
 
         addBitwise = add_oper;
         subBitwise = sub_oper;
+
+        interval = 0.1f;
     }
 
     void Update()
     {
-        
+        interval -= Time.deltaTime;
+
+        if (interval > 0)
+            return;
+
+        interval = 0.1f;
+
+        char operChar = (char)oper;
+        serialController.SendSerialMessage(operChar.ToString());
     }
 
-    public void send_message(int code)
+    public void change_message(int code)
     {
         // code:    -6, -5, ... , -1, 1, 2, ... , 6
         // > 0:     add moving(bit)
@@ -53,9 +65,7 @@ public class MsgListener : MonoBehaviour
             oper = result(oper, (int)Mathf.Pow(2.0f, code), subBitwise);
         }
 
-        char operChar = (char)oper;
-        Debug.Log(oper + " is sending to device");
-        serialController.SendSerialMessage(operChar.ToString());
+        Debug.Log("operation code changed to " + oper);
     }
 
     void OnMessageArrived(string msg)

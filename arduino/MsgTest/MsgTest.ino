@@ -24,35 +24,33 @@ void loop()
 {
   BLECentral device_central = device.central();
 
+  char operCode = 0;
+
   if (device_central) {
     
     Serial.print("connected to the central: ");
     Serial.println(device_central.address());
 
     while (device_central.connected()) {
-      
-      if (char temp = device_char.value()) {
 
-        Serial.println("received: " + String(int(temp)));
+      if (device_char.written())
+        operCode = device_char.value();
 
-        if (temp & 1)
-          Serial.println("1st bit is activated");
-        if (temp & 2)
-          Serial.println("2nd bit is activated");
-        if (temp & 4)
-          Serial.println("3rd bit is activated");
-        if (temp & 8)
-          Serial.println("4th bit is activated");
-        if (temp & 16)
-          Serial.println("5th bit is activated");
-        if (temp & 32)
-          Serial.println("6th bit is activated");
+      Serial.println("received: " + String(int(operCode)));
 
-        device.end();
-      }
+      if (operCode & 1)
+        Serial.println("1st bit is activated");
+      if (operCode & 2)
+        Serial.println("2nd bit is activated");
+      if (operCode & 4)
+        Serial.println("3rd bit is activated");
+      if (operCode & 8)
+        Serial.println("4th bit is activated");
+      if (operCode & 16)
+        Serial.println("5th bit is activated");
+      if (operCode & 32)
+        Serial.println("6th bit is activated");
     }
-
-    device.begin();
   }
   else
     Serial.println("device is not connected with central");

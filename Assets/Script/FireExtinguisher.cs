@@ -37,13 +37,13 @@ public class FireExtinguisher : MonoBehaviour {
 
                     emission.enabled = true;
                     fbxShooting.Play();
-                    msgListener.send_message(2);
+                    msgListener.change_message(2);
                 }
                 else {
 
                     fbxShooting.Stop();
                     emission.enabled = false;
-                    msgListener.send_message(-2);
+                    msgListener.change_message(-2);
                 }
             }
         }
