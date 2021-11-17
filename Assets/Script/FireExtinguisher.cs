@@ -51,7 +51,7 @@ public class FireExtinguisher : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.name == "Fireball_big_red_Door") {
+        if (other.gameObject.name == "FireSmall") {
 
             if (this.transform.parent.name.Contains("C")) {
 

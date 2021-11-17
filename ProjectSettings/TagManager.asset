@@ -9,6 +9,7 @@ TagManager:
   - handkerchief
   - interface
   - Item
+  - Activate
   layers:
   - Default
   - TransparentFX
