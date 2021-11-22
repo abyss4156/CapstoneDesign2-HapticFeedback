@@ -21,7 +21,7 @@ public class SmallFireTouch : MonoBehaviour {
 
     void OnCollisionEnter (Collision collision)
     {
-        if (collision.collider.gameObject.name == "Player") {
+        if (collision.collider.gameObject.tag == "Player") {
 
             ui.warning = true;
 

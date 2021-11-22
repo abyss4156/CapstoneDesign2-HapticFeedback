@@ -58,7 +58,8 @@ public class ClickActivate : MonoBehaviour
                     ui.announcing = true;
                 }
 
-                msgListener.change_message(5);
+                if (!condition.is_curtainWatered)
+                    condition.cooling();
             }
             else if (this.name == "ElectroPanel") {
 

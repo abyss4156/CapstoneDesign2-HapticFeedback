@@ -21,19 +21,22 @@ public class BigFireTouch : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (condition.get_curtain && condition.is_curtainWatered) {
+        if (collision.collider.gameObject.tag == "Player") {
 
-            BoxCollider boxCollider = GetComponent<BoxCollider>();
-            boxCollider.enabled = false;
-        }
-        else {
+            if (condition.get_curtain && condition.is_curtainWatered) {
 
-            ui.warning = true;
+                BoxCollider boxCollider = GetComponent<BoxCollider>();
+                boxCollider.enabled = false;
+            }
+            else {
 
-            if (!condition.get_curtain)
-                ui.warning_about = 3;
-            else
-                ui.warning_about = 5;
+                ui.warning = true;
+
+                if (!condition.get_curtain)
+                    ui.warning_about = 3;
+                else
+                    ui.warning_about = 5;
+            }
         }
     }
 }
