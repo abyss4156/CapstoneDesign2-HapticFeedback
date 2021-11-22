@@ -9930,7 +9930,7 @@ GameObject:
   - component: {fileID: 758577461}
   - component: {fileID: 758577460}
   m_Layer: 0
-  m_Name: CursorIcon
+  m_Name: GazeIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32217,7 +32217,7 @@ MonoBehaviour:
   dimOnHideRequest: 1
   depthScaleMultiplier: 0.03
   matchNormalOnPhysicsColliders: 0
-  rayTransform: {fileID: 0}
+  rayTransform: {fileID: 704627094}
 --- !u!4 &1624116866
 Transform:
   m_ObjectHideFlags: 0

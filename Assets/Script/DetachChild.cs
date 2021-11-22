@@ -16,8 +16,8 @@ public class DetachChild : MonoBehaviour {
 	
 	void Update ()
     {
-        if (condition.is_holding && this.transform.parent != null && Input.GetButtonDown("Fire2")) {
-        //if (condition.is_holding && this.transform.parent != null && OVRInput.Get(OVRInput.Button.Two)) {
+        //if (condition.is_holding && this.transform.parent != null && Input.GetButtonDown("Fire2")) {
+        if (condition.is_holding && this.transform.parent != null && OVRInput.Get(OVRInput.Button.Two)) {
 
             this.transform.parent.DetachChildren();
             rb = this.gameObject.AddComponent<Rigidbody>();

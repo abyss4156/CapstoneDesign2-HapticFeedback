@@ -30,8 +30,8 @@ public class FireExtinguisher : MonoBehaviour {
 
             var emission = powder.emission;
 
-            if (Input.GetButtonDown("Fire1")) {
-            //if (OVRInput.Get(OVRInput.Button.One)) {
+            //if (Input.GetButtonDown("Fire1")) {
+            if (OVRInput.Get(OVRInput.Button.One)) {
 
                 if (!emission.enabled) {
 

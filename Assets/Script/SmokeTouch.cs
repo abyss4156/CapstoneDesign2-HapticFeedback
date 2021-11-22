@@ -22,9 +22,10 @@ public class SmokeTouch : MonoBehaviour
     {
         if (other.gameObject.tag == "Player") {
 
+            msgListener.change_message(4);
+
             if (!condition.is_curtainWatered) {
 
-                msgListener.change_message(4);
                 msgListener.change_message(6);
             }
         }

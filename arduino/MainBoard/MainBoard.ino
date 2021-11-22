@@ -8,7 +8,6 @@ BLEPeripheral device;
 BLEService device_serv(serv_uuid);
 BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENotify);
 
-
 int oper = 0;
 
 /*  pin number
