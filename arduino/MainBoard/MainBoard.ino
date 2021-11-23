@@ -1,6 +1,7 @@
 #include <CurieBLE.h>
 #include <Wire.h>
 
+// personal BLE characteristic UUID
 const char* serv_uuid = "fbac47bc-c3a8-4119-b5cd-1fa5b8783681";
 const char* char_uuid = "fbac47bd-c3a8-4119-b5cd-1fa5b8783681";
 
@@ -8,34 +9,37 @@ BLEPeripheral device;
 BLEService device_serv(serv_uuid);
 BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENotify);
 
-int oper = 0;
-
 /*  pin number
  *  PWM2  : output for micro vibration motor
- *    first amp input right
+ *          first amp input right
  *  PWM3  : same as above
- *    first amp input left
+ *          first amp input left
  *  PWM4  : same as above
- *    second amp input right
+ *          second amp input right
  *  PWM5  : same as above
- *    second amp input left
- *  PWM9  : output for peltier heater module
- *    relay input 1
- *  PWM10 : output for peltier cooler module
- *    relay input 2
- *  PWM11 : output for cooling fan
- *    relay input 3
+ *          second amp input left
+ *  PWM11 : output for peltier heater module
+ *          relay input 1
+ *  PWM12 : output for peltier cooler module
+ *          relay input 2
+ *  PWM13 : output for cooling fan
+ *          relay input 3
  *  A4    : wire communication for controlling DC motors
  */
-int vib[4] = [2, 3, 4, 5];
+int vib[4] = {2, 3, 4, 5};
+int peltier[3] = {11, 12, 13};
 int dcInput = 4;
-int peltier[3] = [9, 10, 11];
+
+// to check keeping activation of cooling module
+bool keepCool = false;
+unsigned long lastTime = 0;
 
 void setup()
 {
+  randomSeed(analogRead(0));
+  
   Wire.begin();
   Serial.begin(9600);
-  randomSeed(analogRead(0));
   
   pinMode(vib[0], OUTPUT);
   pinMode(vib[1], OUTPUT);
@@ -64,110 +68,95 @@ void loop()
       
       if (char temp = device_char.value()) {
 
-        Serial.println("received: " + String(int(temp)));
+        Serial.print("received: " + String(int(temp)) + "\t");
 
+        /*  meaning of each bits
+         *  bit1  : explosion
+         *  bit2  : regular vibration
+         *  bit3  : random vibration
+         *  bit4  : wind
+         *  bit5  : cooling module
+         *  bit6  : heating module
+         */
+
+        // print serial bits for check
+        Serial.print(temp&1 ? 1 : 0);
+        Serial.print(temp&2 ? 1 : 0);
+        Serial.print(temp&4 ? 1 : 0);
+        Serial.print(temp&8 ? 1 : 0);
+        Serial.print(temp&16 ? 1 : 0);
+        Serial.println(temp&32 ? 1 : 0);
+
+        // decide vibration mode 
         if (temp & 1) {
-          
-          Serial.println("1st bit is activated");
-          vibration_explosion();
+          for (int i = 0; i < 4; i++)
+            analogWrite(vib[i], 200);
         }
-        
-        if (temp & 2) {
-          
-          Serial.println("2nd bit is activated");
-          vibration_regular();
+        else if (temp & 2) {
+          for (int i = 0; i < 4; i++)
+            analogWrite(vib[i], 100);
         }
-        
-        if (temp & 4) {
-          
-          Serial.println("3rd bit is activated");
-          vibration_waterdrop();
+        else if (temp & 4)
+          vibration_random();
+        else {
+          for (int i = 0; i < 4; i++)
+            analogWrite(vib[i], 0);
         }
-        
-        if (temp & 8) {
-          
-          Serial.println("4th bit is activated");
-          Wire.beginTransmission(dcInput);
-          Wire.write(wind);
-          Wire.endTransmission();
-        }
-        
-        if (temp & 16) {
-          
-          Serial.println("5th bit is activated");
-          digitalWrite(peltier[0], LOW);
-          digitalWrite(peltier[1], HIGH);
-          digitalWrite(peltier[2], HIGH);
-        }
-        
-        if (temp & 32) {
-          
-          Serial.println("6th bit is activated");
-          digitalWrite(peltier[0], HIGH);
-          digitalWrite(peltier[1], LOW);
-          digitalWrite(peltier[2], LOW);
-        }
-        
-        device.end();
+
+        // send the bit whether wind is needed or not
+        Wire.beginTransmission(dcInput);
+        Wire.write(temp&8 ? 1 : 0);
+        Wire.endTransmission();
+
+        // activate or deactivate cooling and heating module
+        if (temp & 16 || keepCool)
+          cooling();
+        digitalWrite(peltier[0], temp&32 ? HIGH : LOW);
       }
     }
-
-    device.begin();
   }
   else
     Serial.println("device is not connected with central");
 }
 
-void vibration_explosion()
-{
-  for (int i = 50; i < 256; i++) {
-    analogWrite(vib[0], i);
-    analogWrite(vib[1], i);
-    analogWrite(vib[2], i);
-    analogWrite(vib[3], i);
-  }
-
-  delay(200);
-
-  for (int i = 0; i < 256; i++) {
-    analogWrite(vib[0], 255 - i);
-    analogWrite(vib[1], 255 - i);
-    analogWrite(vib[2], 255 - i);
-    analogWrite(vib[3], 255 - i);
-  }
-}
-
-void vibration_regular()
-{
-  for (int i = 50; i < 150; i++) {
-    analogWrite(vib[0], i);
-    analogWrite(vib[1], i);
-    analogWrite(vib[2], i);
-    analogWrite(vib[3], i);
-  }
-
-  delay(200);
-
-  for (int i = 0; i < 150; i++) {
-    analogWrite(vib[0], 150 - i);
-    analogWrite(vib[1], 150 - i);
-    analogWrite(vib[2], 150 - i);
-    analogWrite(vib[3], 150 - i);
-  }
-}
-
-void vibration_waterdrop()
+void vibration_random()
 {
   int interval = 0;
   int power = 0;
   
   for (int i = 0; i < 4; i++) {
-    int interval = random(100, 300);
-    int power = random(50, 255);
+    interval = random(50, 250);
+    power = random(100, 250);
 
     analogWrite(vib[i], power);
     delay(100);
     analogWrite(vib[i], 0);
     delay(interval);
+  }
+}
+
+void cooling()
+{
+  // when get in the function first time
+  // set the lastTime when cooling start
+  // then change keepCool value for continue to call this function in loop()
+  if (!keepCool)
+    lastTime = millis();
+  keepCool = true;
+
+  // get the present time
+  // turn on cooling module until reach to the 3000ms after lastTime
+  unsigned long tempTime = millis();
+
+  if (tempTime < lastTime + 3000) {
+    
+    digitalWrite(peltier[1], HIGH);
+    digitalWrite(peltier[2], HIGH);
+  }
+  else {
+
+    digitalWrite(peltier[1], LOW);
+    digitalWrite(peltier[2], LOW);
+    keepCool = false;
   }
 }
