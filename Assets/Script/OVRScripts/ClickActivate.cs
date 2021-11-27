@@ -8,9 +8,11 @@ public class ClickActivate : MonoBehaviour
     public ParticleSystem lightning;
     public ParticleSystem waterDrop;
 
+    MsgListener msgListener;
+
     void Start()
     {
-        
+        msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
     }
 
     void Update()
@@ -58,8 +60,7 @@ public class ClickActivate : MonoBehaviour
                     ui.announcing = true;
                 }
 
-                if (!condition.is_curtainWatered)
-                    condition.cooling();
+                condition.cooling();
             }
             else if (this.name == "ElectroPanel") {
 

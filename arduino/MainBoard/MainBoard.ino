@@ -1,5 +1,4 @@
 #include <CurieBLE.h>
-#include <Wire.h>
 
 // personal BLE characteristic UUID
 const char* serv_uuid = "fbac47bc-c3a8-4119-b5cd-1fa5b8783681";
@@ -10,41 +9,44 @@ BLEService device_serv(serv_uuid);
 BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENotify);
 
 /*  pin number
- *  PWM2  : output for micro vibration motor
+ *  PWM3  : output for micro vibration motor
  *          first amp input right
- *  PWM3  : same as above
- *          first amp input left
- *  PWM4  : same as above
- *          second amp input right
  *  PWM5  : same as above
+ *          first amp input left
+ *  PWM6  : same as above
+ *          second amp input right
+ *  PWM9  : same as above
  *          second amp input left
- *  PWM11 : output for peltier heater module
- *          relay input 1
- *  PWM12 : output for peltier cooler module
- *          relay input 2
- *  PWM13 : output for cooling fan
+ *  DG10  : output for peltier heater module
  *          relay input 3
- *  A4    : wire communication for controlling DC motors
+ *  DG11  : output for peltier cooler module
+ *          relay input 2
+ *  DG12  : output for cooling fan
+ *          relay input 3
+ *  DG4   : send the digital signal for connection with another board
  */
-int vib[4] = {2, 3, 4, 5};
-int peltier[3] = {11, 12, 13};
+int vib[4] = {3, 5, 6, 9};
+int peltier[3] = {12, 11, 10};
 int dcInput = 4;
 
 // to check keeping activation of cooling module
-bool keepCool = false;
-unsigned long lastTime = 0;
+//bool keepCool = false;
+//unsigned long lastTime = 0;
 
 void setup()
 {
   randomSeed(analogRead(0));
   
-  Wire.begin();
   Serial.begin(9600);
   
   pinMode(vib[0], OUTPUT);
   pinMode(vib[1], OUTPUT);
   pinMode(vib[2], OUTPUT);
   pinMode(vib[3], OUTPUT);
+  pinMode(peltier[0], OUTPUT);
+  pinMode(peltier[1], OUTPUT);
+  pinMode(peltier[2], OUTPUT);
+  pinMode(dcInput, OUTPUT);
 
   device.setLocalName("BLE Test");
   device.setAdvertisedServiceUuid(device_serv.uuid());
@@ -70,7 +72,7 @@ void loop()
 
         Serial.print("received: " + String(int(temp)) + "\t");
 
-        /*  meaning of each bits
+        /*  meaning of each binary
          *  bit1  : explosion
          *  bit2  : regular vibration
          *  bit3  : random vibration
@@ -79,7 +81,7 @@ void loop()
          *  bit6  : heating module
          */
 
-        // print serial bits for check
+        // print serial binary for check
         Serial.print(temp&1 ? 1 : 0);
         Serial.print(temp&2 ? 1 : 0);
         Serial.print(temp&4 ? 1 : 0);
@@ -103,14 +105,14 @@ void loop()
             analogWrite(vib[i], 0);
         }
 
-        // send the bit whether wind is needed or not
-        Wire.beginTransmission(dcInput);
-        Wire.write(temp&8 ? 1 : 0);
-        Wire.endTransmission();
+        // send the signal whether wind is needed or not
+        digitalWrite(dcInput, temp&8 ? HIGH : LOW);
 
         // activate or deactivate cooling and heating module
-        if (temp & 16 || keepCool)
-          cooling();
+        //if (temp & 16 || keepCool)
+        //  cooling();
+        digitalWrite(peltier[1], temp&16 ? HIGH : LOW);
+        digitalWrite(peltier[2], temp&16 ? HIGH : LOW);
         digitalWrite(peltier[0], temp&32 ? HIGH : LOW);
       }
     }
@@ -135,6 +137,7 @@ void vibration_random()
   }
 }
 
+/*
 void cooling()
 {
   // when get in the function first time
@@ -160,3 +163,4 @@ void cooling()
     keepCool = false;
   }
 }
+*/

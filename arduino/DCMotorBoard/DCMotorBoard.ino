@@ -1,44 +1,39 @@
-#include <Wire.h>
-
 /*  pin number
- *  PWM13   : power of motor A
- *  PWM12   : spin direction of motor A
- *  PWM11   : spin direction of motor A
- *  PWM10   : power of motor B
- *  PWM9    : spin direction of motor B
- *  PWM8    : spin direction of motor B
+ *  PWM5   : power of motor A
+ *  PWM6   : power of motor B
+ *  DG12   : spin direction of motor A
+ *  DG11   : spin direction of motor A
+ *  DG10   : spin direction of motor B
+ *  DG9    : spin direction of motor B
+ *  DG4    : receive input digital signal
  */
-int enA = 13;
+int enA = 5;
+int enB = 6;
 int in1 = 12;
 int in2 = 11;
-int enB = 10;
-int in3 = 9;
-int in4 = 8;
+int in3 = 10;
+int in4 = 9;
+int input = 4;
 
 void setup()
 {
-  Wire.begin(4);
-  Wire.onReceive(receiveEvent);
-
+  Serial.begin(9600);
+  
   pinMode(enA, OUTPUT);
+  pinMode(enB, OUTPUT);
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
-  pinMode(enB, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
+  pinMode(input, INPUT);
 }
 
 void loop() 
 {
-  delay(100);
-}
+  int oper = int(digitalRead(input));
 
-void receiveEvent(int size)
-{
-  bool wind = Wire.read();
-
-  if (wind) {
-
+  if (oper) {
+    
     Serial.println("received: 1");
     
     digitalWrite(in1, HIGH);
@@ -61,4 +56,6 @@ void receiveEvent(int size)
     digitalWrite(in3, LOW);
     digitalWrite(in4, LOW);
   }
+
+  delay(100);
 }
