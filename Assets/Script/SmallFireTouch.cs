@@ -21,6 +21,8 @@ public class SmallFireTouch : MonoBehaviour {
 
     void OnCollisionEnter (Collision collision)
     {
+        Debug.Log(collision.collider.gameObject.name + " is colliding with smallFire");
+
         if (collision.collider.gameObject.tag == "Player") {
 
             ui.warning = true;

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ClickActivate : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class ClickActivate : MonoBehaviour
     void Start()
     {
         msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
+
+        var emission = waterStream.emission;
+        emission.enabled = false;
     }
 
     void Update()
@@ -30,16 +34,14 @@ public class ClickActivate : MonoBehaviour
             if (this.name == "sink") {
 
                 MsgListener msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
+                AudioSource sfx_waterStream = waterStream.GetComponent<AudioSource>();
 
                 var emission = waterStream.emission;
 
-                if (!emission.enabled) {
-
-                    AudioSource sfx_waterStream = waterStream.GetComponent<AudioSource>();
-
-                    sfx_waterStream.Play();
+                if (!emission.enabled)                    
                     emission.enabled = true;
-                }
+
+                sfx_waterStream.Play();
 
                 if (condition.get_jerrycan && !condition.is_jerrycanWatered) {
 
@@ -60,11 +62,11 @@ public class ClickActivate : MonoBehaviour
                     ui.announcing = true;
                 }
 
-                condition.cooling();
+                condition.cooling = true;
             }
             else if (this.name == "ElectroPanel") {
 
-                if (condition.is_electricTurnOff) {
+                if (!condition.is_electricTurnOff) {
 
                     AudioSource sfx_lightning = lightning.GetComponent<AudioSource>();
                     BoxCollider bc = waterDrop.GetComponent<BoxCollider>();

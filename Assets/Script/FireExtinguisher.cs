@@ -53,24 +53,29 @@ public class FireExtinguisher : MonoBehaviour {
     {
         if (other.gameObject.name == "FireSmall") {
 
-            if (this.transform.parent.name.Contains("C")) {
+            var emission = powder.emission;
 
-                if (lastTime > 0) {
+            if (emission.enabled) {
 
-                    lastTime -= Time.deltaTime;
-                    smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                if (this.transform.parent.name.Contains("C")) {
+
+                    if (lastTime > 0) {
+
+                        lastTime -= Time.deltaTime;
+                        smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                    }
+                    else {
+
+                        Destroy(smallFire.gameObject);
+                        GetComponent<BoxCollider>().enabled = false;
+                        return;
+                    }
                 }
                 else {
 
-                    Destroy(smallFire.gameObject);
-                    GetComponent<BoxCollider>().enabled = false;
-                    return;
+                    ui.warning_about = 7;
+                    ui.warning = true;
                 }
-            }
-            else {
-
-                ui.warning_about = 7;
-                ui.warning = true;
             }
         }
     }

@@ -25,6 +25,8 @@ public class PlayerCondition : MonoBehaviour
 
     MsgListener msgListener;
 
+    [HideInInspector]
+    public bool cooling;
     private float coolingTime;
 
     void Start()
@@ -39,6 +41,9 @@ public class PlayerCondition : MonoBehaviour
         get_curtain = false;
         is_curtainWatered = false;
 
+        cooling = false;
+        coolingTime = 5.0f;
+
         msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
     }
 
@@ -46,18 +51,19 @@ public class PlayerCondition : MonoBehaviour
     {
         if (get_curtain && is_curtainWatered)
             msgListener.change_message(5);
-    }
 
-    public void cooling()
-    {
-        coolingTime = 5.0f;
-
-        while (coolingTime > 0) {
+        if (cooling) {
 
             coolingTime -= Time.deltaTime;
-            msgListener.change_message(5);
-        }
 
-        msgListener.change_message(-5);
+            if (coolingTime > 0)
+                msgListener.change_message(5);
+            else {
+
+                coolingTime = 5.0f;
+                msgListener.change_message(-5);
+                cooling = false;
+            }
+        }
     }
 }

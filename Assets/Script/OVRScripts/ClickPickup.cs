@@ -35,6 +35,8 @@ public class ClickPickup : MonoBehaviour
 
     public void OnClick()
     {
+        rending.sharedMaterial = material[0];
+
         if (this.tag == "PickUp" && !condition.is_holding) {
 
             BoxCollider bc = GetComponent<BoxCollider>();
