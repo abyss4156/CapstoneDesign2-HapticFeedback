@@ -95,10 +95,10 @@ void loop()
           analogWrite(vib[3], 250);
         }
         else if (temp & 2) {
-          analogWrite(vib[0], 100);
-          analogWrite(vib[1], 100);
-          analogWrite(vib[2], 100);
-          analogWrite(vib[3], 100);
+          analogWrite(vib[0], 200);
+          analogWrite(vib[1], 200);
+          analogWrite(vib[2], 200);
+          analogWrite(vib[3], 200);
         }
         else if (temp & 4)
           vibration_random();
