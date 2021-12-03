@@ -29,6 +29,9 @@ public class PlayerCondition : MonoBehaviour
     public bool cooling;
     private float coolingTime;
 
+    bool start;
+    private float startTime;
+
     void Start()
     {
         is_holding = false;
@@ -43,6 +46,9 @@ public class PlayerCondition : MonoBehaviour
 
         cooling = false;
         coolingTime = 5.0f;
+
+        start = true;
+        startTime = 5.0f;
 
         msgListener = GameObject.Find("SerialController").GetComponent<MsgListener>();
     }
@@ -63,6 +69,23 @@ public class PlayerCondition : MonoBehaviour
                 coolingTime = 5.0f;
                 msgListener.change_message(-5);
                 cooling = false;
+            }
+        }
+
+        if (start) {
+
+            startTime -= Time.deltaTime;
+
+            if (startTime > 0) {
+
+                msgListener.change_message(1);
+                msgListener.change_message(4);
+            }
+            else {
+
+                msgListener.change_message(-1);
+                msgListener.change_message(-4);
+                start = false;
             }
         }
     }
