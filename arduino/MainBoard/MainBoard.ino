@@ -21,7 +21,7 @@ BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENot
  *          relay input 3
  *  GPIO11: output for peltier cooler module
  *          relay input 2
- *  GPIO9 : output for cooling fan
+ *  GPIO12 : output for cooling fan
  *          relay input 1
  *  GPIO4 : send the digital signal for connection with another board
  */
