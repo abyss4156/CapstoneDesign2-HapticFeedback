@@ -1,57 +1,62 @@
-#include <Wire.h>
-
 /*  pin number
- *  
+ *  PWM5   : power of motor A
+ *  PWM6   : power of motor B
+ *  GPIO12 : spin direction of motor A
+ *  GPIO11 : spin direction of motor A
+ *  GPIO10 : spin direction of motor B
+ *  GPIO9  : spin direction of motor B
+ *  GPIO4  : receive input digital signal
  */
-int enA = 13;
+int enA = 5;
+int enB = 6;
 int in1 = 12;
 int in2 = 11;
-int enB = 10;
-int in3 = 9;
-int in4 = 8;
+int in3 = 10;
+int in4 = 9;
+int input = 4;
 
 void setup()
 {
-  Wire.begin(4);
-  Wire.onReceive()
-
+  Serial.begin(9600);
+  
   pinMode(enA, OUTPUT);
+  pinMode(enB, OUTPUT);
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
-  pinMode(enB, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
+  pinMode(input, INPUT);
+
+  digitalWrite(enA, LOW);
+  digitalWrite(enB, LOW);
 }
 
 void loop() 
 {
-  delay(100);
-}
+  int oper = int(digitalRead(input));
 
-void receiveEvent(int size)
-{
-  bool wind = Wire.read();
+  if (oper) {
+    
+    Serial.println("received: 1");
 
-  if (wind) {
+    digitalWrite(enA, HIGH);
+    digitalWrite(enB, HIGH);
+
     digitalWrite(in1, HIGH);
     digitalWrite(in2, LOW);
     digitalWrite(in3, HIGH);
     digitalWrite(in4, LOW);
-    
-    for (int i = 0; i < 256; i++) {
-      analogWrite(enA, i);
-      analogWrite(enB, i); 
-    }
   }
   else {
-    for (int i = 0; i < 256; i++) {
-      analogWrite(enA, 255 - i);
-      analogWrite(enB, 255 - i);
-    }
+
+    Serial.println("received: 0");
 
     digitalWrite(in1, LOW);
     digitalWrite(in2, LOW);
     digitalWrite(in3, LOW);
     digitalWrite(in4, LOW);
+
+    digitalWrite(enA, LOW);
+    digitalWrite(enB, LOW);
   }
 }

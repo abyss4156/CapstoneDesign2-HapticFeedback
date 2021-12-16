@@ -30,8 +30,8 @@ public class FireExtinguisher : MonoBehaviour {
 
             var emission = powder.emission;
 
-            if (Input.GetButtonDown("Fire1")) {
-            //if (OVRInput.Get(OVRInput.Button.One)) {
+            //if (Input.GetButtonDown("Fire1")) {
+            if (OVRInput.Get(OVRInput.Button.One)) {
 
                 if (!emission.enabled) {
 
@@ -51,26 +51,31 @@ public class FireExtinguisher : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.name == "Fireball_big_red_Door") {
+        if (other.gameObject.name == "FireSmall") {
 
-            if (this.transform.parent.name.Contains("C")) {
+            var emission = powder.emission;
 
-                if (lastTime > 0) {
+            if (emission.enabled) {
 
-                    lastTime -= Time.deltaTime;
-                    smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                if (this.transform.parent.name.Contains("C")) {
+
+                    if (lastTime > 0) {
+
+                        lastTime -= Time.deltaTime;
+                        smallFire.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f);
+                    }
+                    else {
+
+                        Destroy(smallFire.gameObject);
+                        GetComponent<BoxCollider>().enabled = false;
+                        return;
+                    }
                 }
                 else {
 
-                    Destroy(smallFire.gameObject);
-                    GetComponent<BoxCollider>().enabled = false;
-                    return;
+                    ui.warning_about = 7;
+                    ui.warning = true;
                 }
-            }
-            else {
-
-                ui.warning_about = 7;
-                ui.warning = true;
             }
         }
     }

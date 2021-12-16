@@ -1,6 +1,6 @@
 #include <CurieBLE.h>
-#include <Wire.h>
 
+// personal BLE characteristic UUID
 const char* serv_uuid = "fbac47bc-c3a8-4119-b5cd-1fa5b8783681";
 const char* char_uuid = "fbac47bd-c3a8-4119-b5cd-1fa5b8783681";
 
@@ -8,40 +8,41 @@ BLEPeripheral device;
 BLEService device_serv(serv_uuid);
 BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENotify);
 
-
-int oper = 0;
-
 /*  pin number
- *  PWM2  : output for micro vibration motor
- *    first amp input right
- *  PWM3  : same as above
- *    first amp input left
- *  PWM4  : same as above
- *    second amp input right
+ *  PWM3  : output for micro vibration motor
+ *          first amp input right
  *  PWM5  : same as above
- *    second amp input left
- *  PWM9  : output for peltier heater module
- *    relay input 1
- *  PWM10 : output for peltier cooler module
- *    relay input 2
- *  PWM11 : output for cooling fan
- *    relay input 3
- *  A4    : wire communication for controlling DC motors
+ *          first amp input left
+ *  PWM6  : same as above
+ *          second amp input right
+ *  PWM9  : same as above
+ *          second amp input left
+ *  GPIO10: output for peltier heater module
+ *          relay input 3
+ *  GPIO11: output for peltier cooler module
+ *          relay input 2
+ *  GPIO12 : output for cooling fan
+ *          relay input 1
+ *  GPIO4 : send the digital signal for connection with another board
  */
-int vib[4] = [2, 3, 4, 5];
+int vib[4] = {3, 5, 6, 9};
+int peltier[3] = {12, 11, 10};
 int dcInput = 4;
-int peltier[3] = [9, 10, 11];
 
 void setup()
 {
-  Wire.begin();
-  Serial.begin(9600);
   randomSeed(analogRead(0));
+  
+  Serial.begin(9600);
   
   pinMode(vib[0], OUTPUT);
   pinMode(vib[1], OUTPUT);
   pinMode(vib[2], OUTPUT);
   pinMode(vib[3], OUTPUT);
+  pinMode(peltier[0], OUTPUT);
+  pinMode(peltier[1], OUTPUT);
+  pinMode(peltier[2], OUTPUT);
+  pinMode(dcInput, OUTPUT);
 
   device.setLocalName("BLE Test");
   device.setAdvertisedServiceUuid(device_serv.uuid());
@@ -54,6 +55,8 @@ void setup()
 
 void loop()
 {
+  char temp = 0; 
+  
   BLECentral device_central = device.central();
 
   if (device_central) {
@@ -63,112 +66,109 @@ void loop()
 
     while (device_central.connected()) {
       
-      if (char temp = device_char.value()) {
+      if (temp = device_char.value()) {
 
-        Serial.println("received: " + String(int(temp)));
+        Serial.print("received: " + String(int(temp)) + "\t");
 
+        /*  meaning of each binary
+         *  binary1  : explosion
+         *  binary2  : regular vibration
+         *  binary3  : random vibration
+         *  binary4  : wind
+         *  binary5  : cooling module
+         *  binary6  : heating module
+         */
+
+        // print serial binary for check
+        Serial.print(temp&1 ? 1 : 0);
+        Serial.print(temp&2 ? 1 : 0);
+        Serial.print(temp&4 ? 1 : 0);
+        Serial.print(temp&8 ? 1 : 0);
+        Serial.print(temp&16 ? 1 : 0);
+        Serial.println(temp&32 ? 1 : 0);
+
+        // decide vibration mode 
         if (temp & 1) {
-          
-          Serial.println("1st bit is activated");
-          vibration_explosion();
+          analogWrite(vib[0], 250);
+          analogWrite(vib[1], 250);
+          analogWrite(vib[2], 250);
+          analogWrite(vib[3], 250);
         }
-        
-        if (temp & 2) {
-          
-          Serial.println("2nd bit is activated");
-          vibration_regular();
+        else if (temp & 2) {
+          analogWrite(vib[0], 200);
+          analogWrite(vib[1], 200);
+          analogWrite(vib[2], 200);
+          analogWrite(vib[3], 200);
         }
-        
-        if (temp & 4) {
-          
-          Serial.println("3rd bit is activated");
-          vibration_waterdrop();
+        else if (temp & 4)
+          vibration_random();
+        else {
+          analogWrite(vib[0], 0);
+          analogWrite(vib[1], 0);
+          analogWrite(vib[2], 0);
+          analogWrite(vib[3], 0);
         }
-        
-        if (temp & 8) {
-          
-          Serial.println("4th bit is activated");
-          Wire.beginTransmission(dcInput);
-          Wire.write(wind);
-          Wire.endTransmission();
-        }
-        
-        if (temp & 16) {
-          
-          Serial.println("5th bit is activated");
-          digitalWrite(peltier[0], LOW);
-          digitalWrite(peltier[1], HIGH);
-          digitalWrite(peltier[2], HIGH);
-        }
-        
-        if (temp & 32) {
-          
-          Serial.println("6th bit is activated");
-          digitalWrite(peltier[0], HIGH);
-          digitalWrite(peltier[1], LOW);
-          digitalWrite(peltier[2], LOW);
-        }
-        
-        device.end();
+
+        // send the signal whether wind is needed or not
+        digitalWrite(dcInput, temp&8 ? HIGH : LOW);
+
+        // activate or deactivate cooling and heating module
+        // relay module activate when the signal is LOW, opposite is HIGH
+        digitalWrite(peltier[0], temp&16 ? LOW : HIGH);
+        digitalWrite(peltier[1], temp&16 ? LOW : HIGH);
+        digitalWrite(peltier[2], temp&32 ? LOW : HIGH);
+      }
+      else {
+
+        // if the operation code is 0(null), condition of 'if' state is negative
+        // for exception handling, make 'else' state when the code is 0
+        Serial.println("received: 0\t000000");
+
+        // turn off and deactivate all modules
+        analogWrite(vib[0], 0);
+        analogWrite(vib[1], 0);
+        analogWrite(vib[2], 0);
+        analogWrite(vib[3], 0);
+        digitalWrite(dcInput, LOW);
+        digitalWrite(peltier[0], HIGH);
+        digitalWrite(peltier[1], HIGH);
+        digitalWrite(peltier[2], HIGH);
       }
     }
-
-    device.begin();
   }
-  else
-    Serial.println("device is not connected with central");
-}
+  else {
 
-void vibration_explosion()
-{
-  for (int i = 50; i < 256; i++) {
-    analogWrite(vib[0], i);
-    analogWrite(vib[1], i);
-    analogWrite(vib[2], i);
-    analogWrite(vib[3], i);
-  }
+    Serial.println("device is not connected with central");  
 
-  delay(200);
-
-  for (int i = 0; i < 256; i++) {
-    analogWrite(vib[0], 255 - i);
-    analogWrite(vib[1], 255 - i);
-    analogWrite(vib[2], 255 - i);
-    analogWrite(vib[3], 255 - i);
+    // when the device disconnect with content abnormaly
+    // module can be leaved as activated states
+    // for exception handling, turn off all modules
+    analogWrite(vib[0], 0);
+    analogWrite(vib[1], 0);
+    analogWrite(vib[2], 0);
+    analogWrite(vib[3], 0);
+    digitalWrite(dcInput, LOW);
+    digitalWrite(peltier[0], HIGH);
+    digitalWrite(peltier[1], HIGH);
+    digitalWrite(peltier[2], HIGH);
   }
 }
 
-void vibration_regular()
-{
-  for (int i = 50; i < 150; i++) {
-    analogWrite(vib[0], i);
-    analogWrite(vib[1], i);
-    analogWrite(vib[2], i);
-    analogWrite(vib[3], i);
-  }
-
-  delay(200);
-
-  for (int i = 0; i < 150; i++) {
-    analogWrite(vib[0], 150 - i);
-    analogWrite(vib[1], 150 - i);
-    analogWrite(vib[2], 150 - i);
-    analogWrite(vib[3], 150 - i);
-  }
-}
-
-void vibration_waterdrop()
+void vibration_random()
 {
   int interval = 0;
   int power = 0;
+  int index = 0;
   
-  for (int i = 0; i < 4; i++) {
-    int interval = random(100, 300);
-    int power = random(50, 255);
+  for (int i = 0; i < 5; i++) {
+    
+    interval = random(50, 150);
+    power = random(150, 250);
+    index = random(4);
 
-    analogWrite(vib[i], power);
-    delay(100);
-    analogWrite(vib[i], 0);
+    analogWrite(vib[index], power);
+    delay(50);
+    analogWrite(vib[index], 0);
     delay(interval);
   }
 }
