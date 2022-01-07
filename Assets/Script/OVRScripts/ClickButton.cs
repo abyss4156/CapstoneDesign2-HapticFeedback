@@ -6,21 +6,24 @@ using UnityEngine.SceneManagement;
 
 public class ClickButton : MonoBehaviour
 {
-    // Start is called before the first frame update
+    Camera cam;
+    Ray ray;
+    RaycastHit hit;
+
     void Start()
     {
-        
+        cam = GameObject.Find("CenterEyeAnchor").GetComponent<Camera>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        ray = new Ray(cam.transform.position, cam.transform.rotation * Vector3.forward);
     }
 
     public void OnGazeEnter()
     {
-        this.GetComponent<Image>().color = new Color32(100, 100, 100, 100);
+        if (Physics.Raycast(ray, out hit, 2.0f))
+            this.GetComponent<Image>().color = new Color32(100, 100, 100, 100);
     }
 
     public void OnGazeExit()
@@ -30,9 +33,12 @@ public class ClickButton : MonoBehaviour
 
     public void OnClick()
     {
-        if (this.name == "TitleButton")
-            SceneManager.LoadScene("SampleScene");
-        else if (this.name == "EndingButton")
-            SceneManager.LoadScene("Title");
+        if (Physics.Raycast(ray, out hit, 2.0f))
+        {
+            if (this.name == "TitleButton")
+                SceneManager.LoadScene("SampleScene");
+            else if (this.name == "EndingButton")
+                SceneManager.LoadScene("Title");
+        }
     }
 }
