@@ -1,5 +1,12 @@
 #include <CurieBLE.h>
 
+#define EXPLOSION   0x01
+#define REGULAR_VIB 0x02
+#define RANDOM_VIB  0x04
+#define WIND        0x08
+#define COOLING     0x10
+#define HEATING     0x20
+
 // personal BLE characteristic UUID
 const char* serv_uuid = "fbac47bc-c3a8-4119-b5cd-1fa5b8783681";
 const char* char_uuid = "fbac47bd-c3a8-4119-b5cd-1fa5b8783681";
@@ -59,15 +66,15 @@ void loop()
   
   BLECentral device_central = device.central();
 
-  if (device_central) {
-    
+  if (device_central) 
+  {
     Serial.print("connected to the central: ");
     Serial.println(device_central.address());
 
-    while (device_central.connected()) {
-      
-      if (temp = device_char.value()) {
-
+    while (device_central.connected()) 
+    {
+      if (temp = device_char.value()) 
+      {
         Serial.print("received: " + String(int(temp)) + "\t");
 
         /*  meaning of each binary
@@ -80,29 +87,34 @@ void loop()
          */
 
         // print serial binary for check
-        Serial.print(temp&1 ? 1 : 0);
-        Serial.print(temp&2 ? 1 : 0);
-        Serial.print(temp&4 ? 1 : 0);
-        Serial.print(temp&8 ? 1 : 0);
-        Serial.print(temp&16 ? 1 : 0);
-        Serial.println(temp&32 ? 1 : 0);
+        Serial.print(temp&EXPLOSION ? 1 : 0);
+        Serial.print(temp&REGULAR_VIB ? 1 : 0);
+        Serial.print(temp&RANDOM_VIB ? 1 : 0);
+        Serial.print(temp&WIND ? 1 : 0);
+        Serial.print(temp&COOLING ? 1 : 0);
+        Serial.println(temp&HEATING ? 1 : 0);
 
         // decide vibration mode 
-        if (temp & 1) {
+        if (temp & EXPLOSION) 
+        {
           analogWrite(vib[0], 250);
           analogWrite(vib[1], 250);
           analogWrite(vib[2], 250);
           analogWrite(vib[3], 250);
         }
-        else if (temp & 2) {
+        else if (temp & REGULAR_VIB) 
+        {
           analogWrite(vib[0], 200);
           analogWrite(vib[1], 200);
           analogWrite(vib[2], 200);
           analogWrite(vib[3], 200);
         }
-        else if (temp & 4)
+        else if (temp & RANDOM_VIB)
+        {
           vibration_random();
-        else {
+        }
+        else 
+        {
           analogWrite(vib[0], 0);
           analogWrite(vib[1], 0);
           analogWrite(vib[2], 0);
@@ -110,16 +122,16 @@ void loop()
         }
 
         // send the signal whether wind is needed or not
-        digitalWrite(dcInput, temp&8 ? HIGH : LOW);
+        digitalWrite(dcInput, temp & WIND ? HIGH : LOW);
 
         // activate or deactivate cooling and heating module
         // relay module activate when the signal is LOW, opposite is HIGH
-        digitalWrite(peltier[0], temp&16 ? LOW : HIGH);
-        digitalWrite(peltier[1], temp&16 ? LOW : HIGH);
-        digitalWrite(peltier[2], temp&32 ? LOW : HIGH);
+        digitalWrite(peltier[0], temp & COOLING ? LOW : HIGH);
+        digitalWrite(peltier[1], temp & COOLING ? LOW : HIGH);
+        digitalWrite(peltier[2], temp & HEATING ? LOW : HIGH);
       }
-      else {
-
+      else 
+      {
         // if the operation code is 0(null), condition of 'if' state is negative
         // for exception handling, make 'else' state when the code is 0
         Serial.println("received: 0\t000000");
@@ -136,8 +148,8 @@ void loop()
       }
     }
   }
-  else {
-
+  else 
+  {
     Serial.println("device is not connected with central");  
 
     // when the device disconnect with content abnormaly
@@ -160,8 +172,8 @@ void vibration_random()
   int power = 0;
   int index = 0;
   
-  for (int i = 0; i < 5; i++) {
-    
+  for (int i = 0; i < 5; i++) 
+  {  
     interval = random(50, 150);
     power = random(150, 250);
     index = random(4);

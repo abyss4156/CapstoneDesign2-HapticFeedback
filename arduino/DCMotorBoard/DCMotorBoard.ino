@@ -35,8 +35,8 @@ void loop()
 {
   int oper = int(digitalRead(input));
 
-  if (oper) {
-    
+  if (oper)
+  {  
     Serial.println("received: 1");
 
     digitalWrite(enA, HIGH);
@@ -47,8 +47,8 @@ void loop()
     digitalWrite(in3, HIGH);
     digitalWrite(in4, LOW);
   }
-  else {
-
+  else 
+  {
     Serial.println("received: 0");
 
     digitalWrite(in1, LOW);
