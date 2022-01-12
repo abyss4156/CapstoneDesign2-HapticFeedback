@@ -19,7 +19,7 @@ public class ClickPickup : MonoBehaviour
         rending.sharedMaterial = material[0];
         condition = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCondition>();
 
-        cam = GameObject.Find("CenterEyeEnchor").GetComponent<Camera>();
+        cam = GameObject.Find("CenterEyeAnchor").GetComponent<Camera>();
     }
 
     void Update()
@@ -41,7 +41,9 @@ public class ClickPickup : MonoBehaviour
     public void OnGazeExit()
     {      
         if (!condition.is_holding)
+        {
             rending.sharedMaterial = material[0];
+        }
     }
 
     public void OnClick()

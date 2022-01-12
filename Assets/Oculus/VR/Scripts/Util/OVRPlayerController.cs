@@ -53,7 +53,7 @@ public class OVRPlayerController : MonoBehaviour
 	/// The player will rotate in fixed steps if Snap Rotation is enabled.
 	/// </summary>
 	[Tooltip("The player will rotate in fixed steps if Snap Rotation is enabled.")]
-	public bool SnapRotation = true;
+	public bool SnapRotation = false;
 
 	/// <summary>
 	/// [Deprecated] When enabled, snap rotation will happen about the guardian rather
@@ -128,7 +128,7 @@ public class OVRPlayerController : MonoBehaviour
 	/// When true, user input will be applied to linear movement. Set this to false whenever the player controller needs to ignore input for
 	/// linear movement.
 	/// </summary>
-	public bool EnableLinearMovement = true;
+	public bool EnableLinearMovement = false;
 
 	/// <summary>
 	/// When true, user input will be applied to rotation. Set this to false whenever the player controller needs to ignore input for rotation.
@@ -138,7 +138,7 @@ public class OVRPlayerController : MonoBehaviour
 	/// <summary>
 	/// Rotation defaults to secondary thumbstick. You can allow either here. Note that this won't behave well if EnableLinearMovement is true.
 	/// </summary>
-	public bool RotationEitherThumbstick = false;
+	public bool RotationEitherThumbstick = true;
 
 	protected CharacterController Controller = null;
 	protected OVRCameraRig CameraRig = null;
@@ -223,11 +223,11 @@ public class OVRPlayerController : MonoBehaviour
 			else
 				return;
 		}
-		//Use keys to ratchet rotation
-		if (Input.GetKeyDown(KeyCode.Q))
+        //Use keys to ratchet rotation
+        if (Input.GetKeyDown(KeyCode.Q))
 			buttonRotation -= RotationRatchet;
-
-		if (Input.GetKeyDown(KeyCode.E))
+        
+        if (Input.GetKeyDown(KeyCode.E))
 			buttonRotation += RotationRatchet;
 	}
 
@@ -418,18 +418,20 @@ public class OVRPlayerController : MonoBehaviour
 			Vector3 euler = RotateAroundGuardianCenter ? transform.rotation.eulerAngles : Vector3.zero;
 			float rotateInfluence = SimulationRate * Time.deltaTime * RotationAmount * RotationScaleMultiplier;
 
-			// bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
-			bool curHatLeft = OVRInput.Get(OVRInput.Button.DpadLeft);
+            // bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
+            //bool curHatLeft = OVRInput.Get(OVRInput.Button.DpadLeft);
+            bool curHatLeft = (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0);
 
-			if (curHatLeft && !prevHatLeft)
+            if (curHatLeft && !prevHatLeft)
 				euler.y -= RotationRatchet;
 
 			prevHatLeft = curHatLeft;
 
 			// bool curHatRight = OVRInput.Get(OVRInput.Button.SecondaryShoulder);
-			bool curHatRight = OVRInput.Get(OVRInput.Button.DpadRight);
+			//bool curHatRight = OVRInput.Get(OVRInput.Button.DpadRight);
+            bool curHatRight = (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger) > 0);
 
-			if (curHatRight && !prevHatRight)
+            if (curHatRight && !prevHatRight)
 				euler.y += RotationRatchet;
 
 			prevHatRight = curHatRight;

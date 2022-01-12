@@ -29,7 +29,9 @@ public class ClickItem : MonoBehaviour
     public void OnGazeEnter()
     {
         if (Physics.Raycast(ray, out hit, 2.0f))
+        {
             rending.sharedMaterial = material[1];
+        }
     }
 
     public void OnGazeExit()
