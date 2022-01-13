@@ -7,13 +7,13 @@
  *  GPIO9  : spin direction of motor B
  *  GPIO4  : receive input digital signal
  */
-int enA = 5;
-int enB = 6;
-int in1 = 12;
-int in2 = 11;
-int in3 = 10;
-int in4 = 9;
-int input = 4;
+const int enA = 5;
+const int enB = 6;
+const int in1 = 12;
+const int in2 = 11;
+const int in3 = 10;
+const int in4 = 9;
+const int input = 4;
 
 void setup()
 {

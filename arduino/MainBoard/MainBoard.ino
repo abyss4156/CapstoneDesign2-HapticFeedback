@@ -1,5 +1,6 @@
 #include <CurieBLE.h>
 
+// FSM of feedback
 #define EXPLOSION   0x01
 #define REGULAR_VIB 0x02
 #define RANDOM_VIB  0x04
@@ -32,9 +33,9 @@ BLEUnsignedCharCharacteristic device_char(char_uuid, BLERead | BLEWrite | BLENot
  *          relay input 1
  *  GPIO4 : send the digital signal for connection with another board
  */
-int vib[4] = {3, 5, 6, 9};
-int peltier[3] = {12, 11, 10};
-int dcInput = 4;
+const int vib[4] = {3, 5, 6, 9};
+const int peltier[3] = {12, 11, 10};
+const int dcInput = 4;
 
 void setup()
 {
@@ -87,12 +88,12 @@ void loop()
          */
 
         // print serial binary for check
-        Serial.print(temp&EXPLOSION ? 1 : 0);
+        Serial.print(temp&EXPLOSION   ? 1 : 0);
         Serial.print(temp&REGULAR_VIB ? 1 : 0);
-        Serial.print(temp&RANDOM_VIB ? 1 : 0);
-        Serial.print(temp&WIND ? 1 : 0);
-        Serial.print(temp&COOLING ? 1 : 0);
-        Serial.println(temp&HEATING ? 1 : 0);
+        Serial.print(temp&RANDOM_VIB  ? 1 : 0);
+        Serial.print(temp&WIND        ? 1 : 0);
+        Serial.print(temp&COOLING     ? 1 : 0);
+        Serial.println(temp&HEATING   ? 1 : 0);
 
         // decide vibration mode 
         if (temp & EXPLOSION) 
@@ -153,8 +154,8 @@ void loop()
     Serial.println("device is not connected with central");  
 
     // when the device disconnect with content abnormaly
-    // module can be leaved as activated states
-    // for exception handling, turn off all modules
+    // module can be leaved as final activated states
+    // for exception handling, turn off all modules to go back initial state
     analogWrite(vib[0], 0);
     analogWrite(vib[1], 0);
     analogWrite(vib[2], 0);
